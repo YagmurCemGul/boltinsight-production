@@ -1,0 +1,358 @@
+import type { ToolConfig, ToolSuggestion, ToolType } from './types';
+
+// Tool configurations
+export const TOOL_CONFIGS: Record<ToolType, ToolConfig> = {
+  moe: {
+    id: 'moe',
+    name: 'Margin of Error',
+    description: 'Calculate the margin of error for your sample size',
+    icon: 'Percent',
+    color: 'blue',
+    fields: [
+      {
+        name: 'sampleSize',
+        label: 'Sample Size',
+        type: 'number',
+        placeholder: 'e.g., 1000',
+        required: true,
+        min: 1,
+        helpText: 'Number of respondents in your study',
+      },
+      {
+        name: 'confidenceLevel',
+        label: 'Confidence Level',
+        type: 'select',
+        required: true,
+        options: [
+          { value: '90', label: '90%' },
+          { value: '95', label: '95% (Recommended)' },
+          { value: '99', label: '99%' },
+        ],
+        defaultValue: '95',
+        helpText: '95% is standard for most market research',
+      },
+      {
+        name: 'populationSize',
+        label: 'Population Size (Optional)',
+        type: 'number',
+        placeholder: 'Leave blank for infinite population',
+        min: 1,
+        helpText: 'Include for finite population correction',
+      },
+    ],
+  },
+  sample: {
+    id: 'sample',
+    name: 'Sample Size Calculator',
+    description: 'Calculate required sample size for desired precision',
+    icon: 'Users',
+    color: 'green',
+    fields: [
+      {
+        name: 'marginOfError',
+        label: 'Desired Margin of Error (%)',
+        type: 'number',
+        placeholder: 'e.g., 5',
+        required: true,
+        min: 0.1,
+        max: 50,
+        step: 0.1,
+        helpText: 'Typical ranges: 3-5% for quantitative',
+      },
+      {
+        name: 'confidenceLevel',
+        label: 'Confidence Level',
+        type: 'select',
+        required: true,
+        options: [
+          { value: '90', label: '90%' },
+          { value: '95', label: '95% (Recommended)' },
+          { value: '99', label: '99%' },
+        ],
+        defaultValue: '95',
+      },
+      {
+        name: 'populationSize',
+        label: 'Population Size (Optional)',
+        type: 'number',
+        placeholder: 'Leave blank for infinite',
+        min: 1,
+      },
+    ],
+  },
+  maxdiff: {
+    id: 'maxdiff',
+    name: 'MaxDiff Calculator',
+    description: 'Calculate optimal MaxDiff design parameters',
+    icon: 'BarChart3',
+    color: 'purple',
+    fields: [
+      {
+        name: 'numAttributes',
+        label: 'Number of Attributes',
+        type: 'number',
+        placeholder: 'e.g., 10',
+        required: true,
+        min: 4,
+        max: 30,
+        helpText: 'Total items to evaluate (typically 8-20)',
+      },
+      {
+        name: 'numShown',
+        label: 'Items Shown per Task',
+        type: 'number',
+        placeholder: 'e.g., 5',
+        required: true,
+        min: 3,
+        max: 7,
+        helpText: 'Optimal is 4-5 for cognitive load',
+      },
+      {
+        name: 'sampleSize',
+        label: 'Sample Size',
+        type: 'number',
+        placeholder: 'e.g., 300',
+        required: true,
+        min: 50,
+        helpText: 'Min 200 for reliable estimates',
+      },
+    ],
+  },
+  loi: {
+    id: 'loi',
+    name: 'LOI Calculator',
+    description: 'Estimate survey length and cost tier',
+    icon: 'Clock',
+    color: 'amber',
+    fields: [
+      {
+        name: 'singleChoice',
+        label: 'Single Choice Questions',
+        type: 'number',
+        placeholder: '0',
+        defaultValue: 10,
+        min: 0,
+      },
+      {
+        name: 'multipleChoice',
+        label: 'Multiple Choice Questions',
+        type: 'number',
+        placeholder: '0',
+        defaultValue: 5,
+        min: 0,
+      },
+      {
+        name: 'matrixQuestions',
+        label: 'Matrix/Grid Questions',
+        type: 'number',
+        placeholder: '0',
+        defaultValue: 3,
+        min: 0,
+      },
+      {
+        name: 'matrixRows',
+        label: 'Avg Rows per Matrix',
+        type: 'number',
+        placeholder: '5',
+        defaultValue: 5,
+        min: 1,
+      },
+      {
+        name: 'openEnds',
+        label: 'Open-End Questions',
+        type: 'number',
+        placeholder: '0',
+        defaultValue: 2,
+        min: 0,
+      },
+    ],
+  },
+  demographics: {
+    id: 'demographics',
+    name: 'Demographics Distribution',
+    description: 'Calculate quota distribution and feasibility',
+    icon: 'PieChart',
+    color: 'teal',
+    fields: [
+      {
+        name: 'totalSample',
+        label: 'Total Sample Size',
+        type: 'number',
+        placeholder: 'e.g., 1000',
+        required: true,
+        min: 50,
+      },
+      {
+        name: 'country',
+        label: 'Country',
+        type: 'select',
+        required: true,
+        options: [
+          { value: 'turkey', label: 'Turkey' },
+          { value: 'uk', label: 'United Kingdom' },
+          { value: 'usa', label: 'United States' },
+          { value: 'germany', label: 'Germany' },
+          { value: 'france', label: 'France' },
+        ],
+        defaultValue: 'turkey',
+      },
+      {
+        name: 'quotaType',
+        label: 'Quota Type',
+        type: 'select',
+        required: true,
+        options: [
+          { value: 'census', label: 'Census Representative' },
+          { value: 'equal', label: 'Equal Split' },
+          { value: 'custom', label: 'Custom' },
+        ],
+        defaultValue: 'census',
+      },
+    ],
+  },
+  feasibility: {
+    id: 'feasibility',
+    name: 'Feasibility Check',
+    description: 'Assess project feasibility and risks',
+    icon: 'ClipboardCheck',
+    color: 'rose',
+    fields: [
+      {
+        name: 'sampleSize',
+        label: 'Sample Size',
+        type: 'number',
+        placeholder: 'e.g., 500',
+        required: true,
+        min: 50,
+      },
+      {
+        name: 'countries',
+        label: 'Number of Countries',
+        type: 'number',
+        placeholder: '1',
+        required: true,
+        min: 1,
+        defaultValue: 1,
+      },
+      {
+        name: 'loi',
+        label: 'LOI (minutes)',
+        type: 'number',
+        placeholder: 'e.g., 15',
+        required: true,
+        min: 1,
+      },
+      {
+        name: 'timeline',
+        label: 'Timeline (days)',
+        type: 'number',
+        placeholder: 'e.g., 14',
+        required: true,
+        min: 1,
+      },
+      {
+        name: 'incidenceRate',
+        label: 'Incidence Rate (%)',
+        type: 'number',
+        placeholder: 'e.g., 30',
+        required: true,
+        min: 1,
+        max: 100,
+        defaultValue: 100,
+      },
+    ],
+  },
+};
+
+// Tool suggestions for empty state
+export const TOOL_SUGGESTIONS: ToolSuggestion[] = [
+  {
+    id: 'moe',
+    label: 'Calculate Margin of Error',
+    description: 'Find the MOE for your sample size',
+    icon: 'Percent',
+    toolType: 'moe',
+    prompt: 'Calculate margin of error',
+  },
+  {
+    id: 'sample',
+    label: 'Calculate Sample Size',
+    description: 'Find required sample for desired precision',
+    icon: 'Users',
+    toolType: 'sample',
+    prompt: 'Calculate sample size',
+  },
+  {
+    id: 'maxdiff',
+    label: 'Design MaxDiff Study',
+    description: 'Optimize MaxDiff design parameters',
+    icon: 'BarChart3',
+    toolType: 'maxdiff',
+    prompt: 'Design a MaxDiff study',
+  },
+  {
+    id: 'loi',
+    label: 'Estimate Survey Length',
+    description: 'Calculate LOI and cost tier',
+    icon: 'Clock',
+    toolType: 'loi',
+    prompt: 'Estimate survey length',
+  },
+  {
+    id: 'demographics',
+    label: 'Set Up Quotas',
+    description: 'Calculate demographic distribution',
+    icon: 'PieChart',
+    toolType: 'demographics',
+    prompt: 'Set up demographic quotas',
+  },
+  {
+    id: 'feasibility',
+    label: 'Check Feasibility',
+    description: 'Assess project feasibility',
+    icon: 'ClipboardCheck',
+    toolType: 'feasibility',
+    prompt: 'Check project feasibility',
+  },
+];
+
+// Welcome message - shown only on first load
+export const WELCOME_MESSAGE = `Hello! I'm your research calculator assistant.
+
+I can help you calculate **sample sizes**, **margin of error**, **LOI estimates**, **MaxDiff designs**, **demographic quotas**, and **project feasibility**.
+
+Select a tool below or type your question to get started!`;
+
+// Follow-up suggestions based on tool type
+export const FOLLOW_UP_SUGGESTIONS: Record<ToolType, string[]> = {
+  moe: [
+    'What sample size would give me ±3% MOE?',
+    'How does MOE change with sample size?',
+    'Is this MOE good for brand tracking?',
+  ],
+  sample: [
+    'What MOE will I get with this sample?',
+    'How many subgroups can I analyze reliably?',
+    'Budget-based sample recommendation',
+  ],
+  maxdiff: [
+    'How many tasks should each respondent see?',
+    'What sample size for stable utilities?',
+    'Compare with conjoint analysis',
+  ],
+  loi: [
+    'How can I reduce survey length?',
+    'What is the dropout risk?',
+    'Calculate cost per respondent',
+  ],
+  demographics: [
+    'What is the feasibility of these quotas?',
+    'Compare with census data',
+    'Suggest incidence rates',
+  ],
+  feasibility: [
+    'How can I improve feasibility?',
+    'What are the main risks?',
+    'Timeline optimization suggestions',
+  ],
+};

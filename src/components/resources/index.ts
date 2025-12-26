@@ -1,0 +1,1 @@
+export { ResourcesHub } from './ResourcesHub';
